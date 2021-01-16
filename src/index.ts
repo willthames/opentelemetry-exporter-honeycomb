@@ -16,4 +16,4 @@
 
 export * from './platform';
 export { ExporterConfig } from './types';
-export * from './zipkin';
+export * from './honey';

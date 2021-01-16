@@ -20,7 +20,7 @@ import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { prepareSend } from './platform/index';
 import * as honeyTypes from './types';
 import {
-  toHoneySpan,
+  toEvent,
   statusCodeTagName,
   statusDescriptionTagName,
 } from './transform';
@@ -40,10 +40,10 @@ export class HoneycombExporter implements SpanExporter {
   private _isShutdown: boolean;
   private _sendingPromises: Promise<unknown>[] = [];
 
-  constructor(config: honeyTypes.ExporterConfig = {}) {
+  constructor(config: honeyTypes.ExporterConfig) {
     const api_url = config.url || HoneycombExporter.DEFAULT_API;
     this._logger = config.logger || new api.NoopLogger();
-    this._send = prepareSend(this._logger, api_url, config.headers);
+    this._send = prepareSend(this._logger, api_url, config.dataset, config.writeKey);
     this._serviceName = config.serviceName;
     this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;
     this._statusDescriptionTagName =
@@ -66,6 +66,7 @@ export class HoneycombExporter implements SpanExporter {
     }
     this._logger.debug('Zipkin exporter export');
     if (this._isShutdown) {
+      // @ts-ignore
       setTimeout(() =>
         resultCallback({
           code: ExportResultCode.FAILED,
@@ -74,7 +75,7 @@ export class HoneycombExporter implements SpanExporter {
       );
       return;
     }
-    const promise = new Promise(resolve => {
+    const promise = new Promise<void>(resolve => {
       this._sendSpans(spans, this._serviceName!, result => {
         resolve();
         resultCallback(result);
@@ -106,15 +107,15 @@ export class HoneycombExporter implements SpanExporter {
     serviceName: string,
     done?: (result: ExportResult) => void
   ) {
-    const zipkinSpans = spans.map(span =>
-      toZipkinSpan(
+    const events = spans.map(span =>
+      toEvent(
         span,
         serviceName,
         this._statusCodeTagName,
         this._statusDescriptionTagName
       )
     );
-    return this._send(zipkinSpans, (result: ExportResult) => {
+    return this._send(events, (result: ExportResult) => {
       if (done) {
         return done(result);
       }

@@ -1,39 +1,26 @@
-# OpenTelemetry Zipkin Trace Exporter
+# OpenTelemetry Honeycomb Trace Exporter
 
-[![Gitter chat][gitter-image]][gitter-url]
-[![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
-[![Apache License][license-image]][license-image]
-
-OpenTelemetry Zipkin Trace Exporter allows the user to send collected traces to Zipkin.
-
-[Zipkin](https://zipkin.io/) is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data.
+OpenTelemetry Honeycomb Trace Exporter allows the user to send collected traces to Honeycomb.
 
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/exporter-zipkin
+npm install --save opentelemetry-exporter-honeycomb
 ```
 
-## Usage in Node and Browser
+## Usage in Node
 
 Install the exporter on your application and pass the options. `serviceName` is an optional string. If omitted, the exporter will first try to get the service name from the Resource. If no service name can be detected on the Resource, a fallback name of "OpenTelemetry Service" will be used.
 
 ```js
-const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+const { HoneycombExporter } = require('opentelemetry-exporter-honeycomb');
 
-// Add your zipkin url (`http://localhost:9411/api/v2/spans` is used as
-// default) and application name to the Zipkin options.
-// You can also define your custom headers which will be added automatically.
 const options = {
-  headers: {
-    'my-header': 'header-value',
-  },
-  url: 'your-zipkin-url',
+  dataset: 'your-dataset'
+  writeKey: 'your-write-key'
   serviceName: 'your-application-name'
 }
-const exporter = new ZipkinExporter(options);
+const exporter = new HoneycombExporter(options);
 ```
 
 Now, register the exporter and start tracing.
@@ -55,20 +42,11 @@ Please visit the Zipkin UI endpoint <http://localhost:9411>
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For Zipkin project at <https://zipkin.io/>
-- For help or feedback on this project, join us on [gitter][gitter-url]
+- For Honeycomb info see <https://honeycomb.io/>
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
-[gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-zipkin
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-zipkin
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-exporter-zipkin
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-zipkin&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-zipkin
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-zipkin.svg

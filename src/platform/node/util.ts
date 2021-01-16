@@ -16,84 +16,55 @@
 
 import * as api from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-import * as http from 'http';
-import * as https from 'https';
-import * as url from 'url';
-import * as zipkinTypes from '../../types';
+
+import Libhoney from "libhoney";
+import * as honeyTypes from '../../types';
+
+type _response = { 
+  status_code: number,
+  duration: number,
+  metadata: object,
+  error?: any
+};
 
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
  */
 export function prepareSend(
   logger: api.Logger,
-  urlStr: string,
-  headers?: Record<string, string>
+  dataset: string,
+  writeKey: string,
+  apiHost: string | null,
 ) {
-  const urlOpts = url.parse(urlStr);
-
-  const reqOpts: http.RequestOptions = Object.assign(
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-    },
-    urlOpts
-  );
+  const hny = new Libhoney({
+    writeKey: writeKey,
+    dataset: dataset,
+    apiHost: apiHost || "https://api.honeycomb.io/",
+    responseCallback: (responses : _response[]) => {
+      responses.forEach((resp : _response) => {
+        console.log(resp);
+      });
+    }
+  });
 
   /**
    * Send spans to the remote Zipkin service.
    */
   return function send(
-    zipkinSpans: zipkinTypes.Span[],
+    events: honeyTypes.Event[],
     done: (result: ExportResult) => void
   ) {
-    if (zipkinSpans.length === 0) {
-      logger.debug('Zipkin send with empty spans');
+    if (events.length === 0) {
+      logger.debug('Honeycomb send with empty spans');
       return done({ code: ExportResultCode.SUCCESS });
     }
+    for (let event of events) {
+      let ev = hny.newEvent();
+      for (let key in event) {
+        ev.addField(key, event[key])
+      }
+      ev.send()
+    }
+  }
 
-    const { request } = reqOpts.protocol === 'http:' ? http : https;
-    const req = request(reqOpts, (res: http.IncomingMessage) => {
-      let rawData = '';
-      res.on('data', chunk => {
-        rawData += chunk;
-      });
-      res.on('end', () => {
-        const statusCode = res.statusCode || 0;
-        logger.debug(
-          'Zipkin response status code: %d, body: %s',
-          statusCode,
-          rawData
-        );
-
-        // Consider 2xx and 3xx as success.
-        if (statusCode < 400) {
-          return done({ code: ExportResultCode.SUCCESS });
-          // Consider 4xx as failed non-retriable.
-        } else {
-          return done({
-            code: ExportResultCode.FAILED,
-            error: new Error(
-              `Got unexpected status code from zipkin: ${statusCode}`
-            ),
-          });
-        }
-      });
-    });
-
-    req.on('error', error => {
-      return done({
-        code: ExportResultCode.FAILED,
-        error,
-      });
-    });
-
-    // Issue request to remote service
-    const payload = JSON.stringify(zipkinSpans);
-    logger.debug('Zipkin request payload: %s', payload);
-    req.write(payload, 'utf8');
-    req.end();
-  };
 }
