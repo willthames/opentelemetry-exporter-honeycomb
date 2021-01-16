@@ -11,6 +11,7 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
+    "postinstall": "yarn tsc",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "version": "node ../../scripts/version-update.js",
@@ -38,6 +39,9 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "installConfig": {
+    "pnp": true
   },
   "devDependencies": {
     "@babel/core": "7.12.10",
