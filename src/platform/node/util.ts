@@ -17,7 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
-import Libhoney from "libhoney";
+import { Libhoney } from "libhoney";
 import * as honeyTypes from '../../types';
 
 type _response = { 
