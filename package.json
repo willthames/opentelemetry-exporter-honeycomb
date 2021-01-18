@@ -1,6 +1,6 @@
 {
   "name": "opentelemetry-exporter-honeycomb",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "OpenTelemetry Honeycomb Exporter allows the user to send collected traces to Honeycomb.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
