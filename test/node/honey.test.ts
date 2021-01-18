@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import { ZipkinExporter } from '../../src';
+import { HoneycombExporter } from '../../src';
 import * as zipkinTypes from '../../src/types';
 import { TraceFlags } from '@opentelemetry/api';
 import { SERVICE_RESOURCE } from '@opentelemetry/resources';
@@ -58,15 +58,15 @@ function getReadableSpan() {
   return readableSpan;
 }
 
-describe('Zipkin Exporter - node', () => {
+describe('Honeycomb Exporter - node', () => {
   describe('constructor', () => {
     it('should construct an exporter', () => {
-      const exporter = new ZipkinExporter({ serviceName: 'my-service' });
+      const exporter = new HoneycombExporter({ serviceName: 'my-service' });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
     });
     it('should construct an exporter with url', () => {
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         url: 'http://localhost',
       });
@@ -74,7 +74,7 @@ describe('Zipkin Exporter - node', () => {
       assert.ok(typeof exporter.shutdown === 'function');
     });
     it('should construct an exporter with logger', () => {
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
       });
@@ -82,7 +82,7 @@ describe('Zipkin Exporter - node', () => {
       assert.ok(typeof exporter.shutdown === 'function');
     });
     it('should construct an exporter with statusCodeTagName', () => {
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         statusCodeTagName: 'code',
       });
@@ -90,7 +90,7 @@ describe('Zipkin Exporter - node', () => {
       assert.ok(typeof exporter.shutdown === 'function');
     });
     it('should construct an exporter with statusDescriptionTagName', () => {
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         statusDescriptionTagName: 'description',
       });
@@ -109,7 +109,7 @@ describe('Zipkin Exporter - node', () => {
     });
 
     it('should skip send with empty array', () => {
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
       });
@@ -119,7 +119,7 @@ describe('Zipkin Exporter - node', () => {
       });
     });
 
-    it('should send spans to Zipkin backend and return with Success', () => {
+    it('should send spans to Honeycomb backend and return with Success', () => {
       let requestBody: [zipkinTypes.Span];
       const scope = nock('http://localhost:9411')
         .post('/api/v2/spans', (body: [zipkinTypes.Span]) => {
@@ -185,7 +185,7 @@ describe('Zipkin Exporter - node', () => {
         instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
       });
@@ -241,7 +241,7 @@ describe('Zipkin Exporter - node', () => {
         .post('/api/v2/spans')
         .reply(200);
 
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
         url: 'https://localhost:9411/api/v2/spans',
@@ -258,7 +258,7 @@ describe('Zipkin Exporter - node', () => {
         .post('/api/v2/spans')
         .reply(400);
 
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
       });
@@ -274,7 +274,7 @@ describe('Zipkin Exporter - node', () => {
         .post('/api/v2/spans')
         .reply(500);
 
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
       });
@@ -290,7 +290,7 @@ describe('Zipkin Exporter - node', () => {
         .post('/api/v2/spans')
         .replyWithError(new Error('My Socket Error'));
 
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
       });
@@ -302,7 +302,7 @@ describe('Zipkin Exporter - node', () => {
     });
 
     it('should return failed result after shutdown', done => {
-      const exporter = new ZipkinExporter({
+      const exporter = new HoneycombExporter({
         serviceName: 'my-service',
         logger: new api.NoopLogger(),
       });
@@ -377,7 +377,7 @@ describe('Zipkin Exporter - node', () => {
         instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
-      const exporter = new ZipkinExporter({});
+      const exporter = new HoneycombExporter({});
 
       exporter.export([span1, span2], (result: ExportResult) => {
         scope.done();
@@ -451,7 +451,7 @@ describe('Zipkin Exporter - node', () => {
         instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
-      const exporter = new ZipkinExporter({});
+      const exporter = new HoneycombExporter({});
 
       exporter.export([span1, span2], (result: ExportResult) => {
         scope.done();
@@ -470,7 +470,7 @@ describe('Zipkin Exporter - node', () => {
           .post('/api/v2/spans')
           .replyWithError(expectedError);
 
-        const exporter = new ZipkinExporter({
+        const exporter = new HoneycombExporter({
           serviceName: 'my-service',
           logger: new api.NoopLogger(),
         });

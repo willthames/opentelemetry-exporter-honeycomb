@@ -17,7 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
-import { Libhoney } from "libhoney";
+import Libhoney from "libhoney";
 import * as honeyTypes from '../../types';
 
 type _response = { 
@@ -26,6 +26,10 @@ type _response = {
   metadata: object,
   error?: any
 };
+
+var printError = function(error, explicit) {
+  console.log(`[${explicit ? 'EXPLICIT' : 'INEXPLICIT'}] ${error.name}: ${error.message}`);
+}
 
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
@@ -36,17 +40,25 @@ export function prepareSend(
   writeKey: string,
   apiHost: string | null,
 ) {
-  const hny = new Libhoney({
-    writeKey: writeKey,
-    dataset: dataset,
-    apiHost: apiHost || "https://api.honeycomb.io/",
-    responseCallback: (responses : _response[]) => {
-      responses.forEach((resp : _response) => {
-        console.log(resp);
-      });
+  let hny
+  try {
+    hny = new Libhoney({
+      writeKey: writeKey,
+      dataset: dataset,
+      apiHost: apiHost || "https://api.honeycomb.io/",
+      responseCallback: (responses : _response[]) => {
+        responses.forEach((resp : _response) => {
+          console.log(resp);
+        });
+      }
+    });
+  } catch (e) {
+    if (e instanceof TypeError) {
+        printError(e, true);
+    } else {
+        printError(e, false);
     }
-  });
-
+  }
   /**
    * Send spans to the remote Zipkin service.
    */
