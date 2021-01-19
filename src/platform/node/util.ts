@@ -27,10 +27,6 @@ type _response = {
   error?: any
 };
 
-var printError = function(error, explicit) {
-  console.log(`[${explicit ? 'EXPLICIT' : 'INEXPLICIT'}] ${error.name}: ${error.message}`);
-}
-
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
  */

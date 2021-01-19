@@ -78,3 +78,10 @@ package.json.lerna_backup
 
 # VsCode configs
 .vscode/
+
+# yarn 2 settings
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/versions
+.pnp.*
