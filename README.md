@@ -1,6 +1,6 @@
 # OpenTelemetry Honeycomb Trace Exporter
 
-OpenTelemetry Honeycomb Trace Exporter allows the user to send collected traces to Honeycomb.
+OpenTelemetry Honeycomb Trace Exporter allows the user to send collected traces to [Honeycomb](https://www.honeycomb.io).
 
 ## Installation
 
@@ -9,6 +9,8 @@ npm install --save opentelemetry-exporter-honeycomb
 ```
 
 ## Usage in Node
+
+You will need a write key for your team and a dataset name (the dataset need not exist yet)
 
 Install the exporter on your application and pass the options. `serviceName` is an optional string. If omitted, the exporter will first try to get the service name from the Resource. If no service name can be detected on the Resource, a fallback name of "OpenTelemetry Service" will be used.
 
@@ -36,7 +38,7 @@ You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your
 
 ## Viewing your traces
 
-Please visit the Zipkin UI endpoint <http://localhost:9411>
+Go to https://ui.honeycomb.io
 
 ## Useful links
 
