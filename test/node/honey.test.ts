@@ -61,14 +61,20 @@ function getReadableSpan() {
 describe('Honeycomb Exporter - node', () => {
   describe('constructor', () => {
     it('should construct an exporter', () => {
-      const exporter = new HoneycombExporter({ serviceName: 'my-service' });
+      const exporter = new HoneycombExporter({
+        serviceName: 'my-service',
+        dataset: 'my-dataset',
+        writeKey: 'my-writekey',
+      });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
     });
     it('should construct an exporter with url', () => {
       const exporter = new HoneycombExporter({
         serviceName: 'my-service',
-        url: 'http://localhost',
+        dataset: 'my-dataset',
+        writeKey: 'my-writekey',
+        apiHost: 'http://localhost',
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -76,6 +82,8 @@ describe('Honeycomb Exporter - node', () => {
     it('should construct an exporter with logger', () => {
       const exporter = new HoneycombExporter({
         serviceName: 'my-service',
+        dataset: 'my-dataset',
+        writeKey: 'my-writekey',
         logger: new api.NoopLogger(),
       });
       assert.ok(typeof exporter.export === 'function');
@@ -84,6 +92,8 @@ describe('Honeycomb Exporter - node', () => {
     it('should construct an exporter with statusCodeTagName', () => {
       const exporter = new HoneycombExporter({
         serviceName: 'my-service',
+        dataset: 'my-dataset',
+        writeKey: 'my-writekey',
         statusCodeTagName: 'code',
       });
       assert.ok(typeof exporter.export === 'function');
@@ -92,6 +102,8 @@ describe('Honeycomb Exporter - node', () => {
     it('should construct an exporter with statusDescriptionTagName', () => {
       const exporter = new HoneycombExporter({
         serviceName: 'my-service',
+        dataset: 'my-dataset',
+        writeKey: 'my-writekey',
         statusDescriptionTagName: 'description',
       });
       assert.ok(typeof exporter.export === 'function');
@@ -111,6 +123,8 @@ describe('Honeycomb Exporter - node', () => {
     it('should skip send with empty array', () => {
       const exporter = new HoneycombExporter({
         serviceName: 'my-service',
+        dataset: 'my-dataset',
+        writeKey: 'my-writekey',
         logger: new api.NoopLogger(),
       });
 

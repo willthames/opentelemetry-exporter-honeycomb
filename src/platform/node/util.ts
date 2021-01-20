@@ -19,6 +19,7 @@ import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 import * as Libhoney from "libhoney";
 import * as honeyTypes from '../../types';
+import { HoneyOptions } from '../../types/libhoney';
 
 type _response = { 
   status_code: number,
@@ -34,15 +35,22 @@ export function prepareSend(
   logger: api.Logger,
   dataset: string,
   writeKey: string,
-  apiHost: string | null,
+  apiHost?: string,
 ) {
-  const hny = new Libhoney({
+  let options: HoneyOptions = {
     writeKey: writeKey,
     dataset: dataset,
-    apiHost: apiHost || "https://api.honeycomb.io/",
+  }
+  if (apiHost) {
+    options.apiHost = apiHost
+  }
+  const hny = new Libhoney({
+    ...options,
     responseCallback: (responses : _response[]) => {
       responses.forEach((resp : _response) => {
-        console.log(resp);
+        if (resp.error) {
+          logger.error(resp.error);
+        }
       });
     }
   });

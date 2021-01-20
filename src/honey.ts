@@ -30,7 +30,6 @@ import { SERVICE_RESOURCE } from '@opentelemetry/resources';
  * Honeycomb Exporter
  */
 export class HoneycombExporter implements SpanExporter {
-  static readonly DEFAULT_API = 'api.honeycomb.io';
   private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
   private readonly _logger: api.Logger;
   private readonly _statusCodeTagName: string;
@@ -38,12 +37,13 @@ export class HoneycombExporter implements SpanExporter {
   private _send: honeyTypes.SendFunction;
   private _serviceName?: string;
   private _isShutdown: boolean;
+  private _apiUrl?: string;
   private _sendingPromises: Promise<unknown>[] = [];
 
   constructor(config: honeyTypes.ExporterConfig) {
-    const api_url = config.url || HoneycombExporter.DEFAULT_API;
+    this._apiUrl = config.url;
     this._logger = config.logger || new api.NoopLogger();
-    this._send = prepareSend(this._logger, api_url, config.dataset, config.writeKey);
+    this._send = prepareSend(this._logger, config.dataset, config.writeKey, this._apiUrl);
     this._serviceName = config.serviceName;
     this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;
     this._statusDescriptionTagName =
@@ -64,7 +64,7 @@ export class HoneycombExporter implements SpanExporter {
           this.DEFAULT_SERVICE_NAME
       );
     }
-    this._logger.debug('Zipkin exporter export');
+    this._logger.debug('Honeycomb exporter export');
     if (this._isShutdown) {
       // @ts-ignore
       setTimeout(() =>
@@ -90,7 +90,7 @@ export class HoneycombExporter implements SpanExporter {
    * Shutdown exporter. Noop operation in this exporter.
    */
   shutdown(): Promise<void> {
-    this._logger.debug('Zipkin exporter shutdown');
+    this._logger.debug('Honeycomb exporter shutdown');
     this._isShutdown = true;
     return new Promise((resolve, reject) => {
       Promise.all(this._sendingPromises).then(() => {
@@ -100,7 +100,7 @@ export class HoneycombExporter implements SpanExporter {
   }
 
   /**
-   * Transform spans and sends to Zipkin service.
+   * Transform spans and sends to Honeycomb service.
    */
   private _sendSpans(
     spans: ReadableSpan[],
