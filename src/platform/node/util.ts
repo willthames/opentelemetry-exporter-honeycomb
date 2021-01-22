@@ -70,6 +70,7 @@ export function prepareSend(
       for (let key in event) {
         ev.addField(key, event[key])
       }
+      ev.timestamp = event.timestamp;
       ev.send()
     }
   }

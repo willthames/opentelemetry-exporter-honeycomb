@@ -16,7 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { hrTimeToMicroseconds, hrTimeToMilliseconds } from '@opentelemetry/core';
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { Event } from './types';
 
 export const statusCodeTagName = 'ot.status_code';
@@ -38,7 +38,7 @@ export function toEvent(
   event.name = span.name
   event.id = span.spanContext.spanId
   event.kind = span.kind
-  event.timestamp = hrTimeToMicroseconds(span.startTime)
+  event.timestamp = new Date(hrTimeToMilliseconds(span.startTime))
   event.duration_ms = hrTimeToMilliseconds(span.duration)
   event.service_name = serviceName
   for (const key of Object.keys(span.attributes)) {
@@ -48,7 +48,7 @@ export function toEvent(
     name => (event[name] = String(span.resource.attributes[name]))
   );
   event.events = span.events.map(event => ({
-    timestamp: hrTimeToMicroseconds(event.time),
+    timestamp: new Date(hrTimeToMilliseconds(event.time)),
     value: event.name,
   }));
   event[statusCodeTagName] = String(api.StatusCode[span.status.code]);
